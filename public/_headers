@@ -1,0 +1,27 @@
+# Cache static assets with long expiry (they use content hashes in filenames)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Font files
+*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images
+*.webp
+  Cache-Control: public, max-age=86400
+
+*.png
+  Cache-Control: public, max-age=86400
+
+*.svg
+  Cache-Control: public, max-age=86400
+
+# HTML - short cache since it may change
+/index.html
+  Cache-Control: public, max-age=3600
+
+# Security headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin

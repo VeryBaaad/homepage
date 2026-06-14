@@ -476,7 +476,7 @@ function renderSkills(filter = '全部') {
         <span class="m3-progress-item__label">${skill.name}</span>
         <span class="m3-progress-item__value">${skill.percent}%</span>
       </div>
-      <div class="m3-linear-progress" role="progressbar" aria-valuenow="${skill.percent}" aria-valuemin="0" aria-valuemax="100">
+      <div class="m3-linear-progress" role="progressbar" aria-valuenow="${skill.percent}" aria-valuemin="0" aria-valuemax="100" aria-label="${skill.name} 熟练度 ${skill.percent}%">
         <div class="m3-linear-progress__track">
           <div class="m3-linear-progress__indicator" data-scale="${skill.percent / 100}">
             <div class="m3-linear-progress__stop"></div>

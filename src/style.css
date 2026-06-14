@@ -286,11 +286,10 @@ button, input, select, textarea { font: inherit; }
 }
 
 .m3-top-app-bar__title {
-  font: var(--md-sys-typescale-title-large);
+  font: 500 22px/28px 'Roboto Flex', 'Noto Sans SC', sans-serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font: 500 22px/28px 'Roboto Flex', 'Noto Sans SC', sans-serif;
 }
 
 .m3-top-app-bar__trailing {
@@ -510,6 +509,8 @@ button, input, select, textarea { font: inherit; }
 
 .m3-section {
   margin-top: 48px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
 }
 
 .m3-section__title {
@@ -719,7 +720,6 @@ button, input, select, textarea { font: inherit; }
 
 .m3-chip--assist:hover {
   background: var(--md-sys-color-on-surface);
-  opacity: 0.92;
   color: var(--md-sys-color-surface);
 }
 
@@ -731,7 +731,6 @@ button, input, select, textarea { font: inherit; }
 
 .m3-chip--filter:hover {
   background: var(--md-sys-color-on-surface-variant);
-  opacity: 0.92;
   color: var(--md-sys-color-surface-container-lowest);
 }
 
