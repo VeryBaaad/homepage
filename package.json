@@ -9,8 +9,12 @@
     "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy"
   },
+  "dependencies": {
+    "@material/web": "^2.4.1"
+  },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.40.2",
+    "cssnano": "^7.1.0",
     "vite": "^8.0.12",
     "wrangler": "^4.100.0"
   }
