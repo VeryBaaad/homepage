@@ -1,19 +1,48 @@
 import './style.css'
 
-// Material Design 3 Web Components
-import '@material/web/button/filled-button.js'
-import '@material/web/button/filled-tonal-button.js'
-import '@material/web/button/outlined-button.js'
-import '@material/web/iconbutton/icon-button.js'
-import '@material/web/icon/icon.js'
-import '@material/web/chips/chip-set.js'
-import '@material/web/chips/filter-chip.js'
-import '@material/web/chips/assist-chip.js'
-import '@material/web/progress/linear-progress.js'
-import '@material/web/divider/divider.js'
-import '@material/web/fab/fab.js'
-import '@material/web/list/list.js'
-import '@material/web/list/list-item.js'
+function createRipple(event) {
+  const el = event.currentTarget
+
+  let container = el.querySelector('.m3-ripple-container')
+  if (!container) {
+    container = document.createElement('div')
+    container.className = 'm3-ripple-container'
+
+    const computed = getComputedStyle(el).position
+    if (computed === 'static') {
+      el.style.position = 'relative'
+    }
+
+    if (getComputedStyle(el).overflow === 'visible') {
+      el.style.overflow = 'hidden'
+    }
+    el.appendChild(container)
+  }
+
+  const rect = el.getBoundingClientRect()
+  const size = Math.max(rect.width, rect.height)
+  const x = event.clientX - rect.left - size / 2
+  const y = event.clientY - rect.top - size / 2
+
+  const ripple = document.createElement('div')
+  ripple.className = 'm3-ripple'
+  ripple.style.width = ripple.style.height = `${size}px`
+  ripple.style.left = `${x}px`
+  ripple.style.top = `${y}px`
+
+  container.appendChild(ripple)
+
+  ripple.addEventListener('animationend', () => ripple.remove())
+}
+
+function initRipples() {
+  const rippleTargets = document.querySelectorAll(
+    '.m3-button, .m3-icon-button, .m3-fab, .m3-nav-item, .m3-chip, .m3-project-card'
+  )
+  rippleTargets.forEach(el => {
+    el.addEventListener('pointerdown', createRipple)
+  })
+}
 
 class TypingEffect {
   constructor(element, strings, options = {}) {
@@ -66,7 +95,7 @@ function initNavDrawer() {
   const drawer = document.getElementById('nav-drawer')
   const toggle = document.getElementById('nav-toggle')
   const scrim = drawer?.querySelector('[data-drawer-close]')
-  const navItems = drawer?.querySelectorAll('md-list-item[data-scroll-to]')
+  const navItems = drawer?.querySelectorAll('.m3-nav-item[data-scroll-to]')
 
   if (!drawer || !toggle) return
 
@@ -112,25 +141,18 @@ function initThemeToggle() {
   const toggles = document.querySelectorAll('#theme-toggle-top, #theme-toggle-drawer')
   if (toggles.length === 0) return
 
-  const iconTop = document.querySelector('#theme-toggle-top md-icon')
-  const iconDrawer = document.querySelector('#theme-toggle-drawer md-icon[slot="start"]')
-  const drawerLabel = document.getElementById('theme-toggle-drawer')
+  const icons = document.querySelectorAll('#theme-toggle-top .material-symbols-outlined, #theme-toggle-drawer .material-symbols-outlined')
 
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme)
     const isDark = theme === 'dark'
-    const iconName = isDark ? 'light_mode' : 'dark_mode'
-    if (iconTop) iconTop.textContent = iconName
-    if (iconDrawer) iconDrawer.textContent = iconName
+    icons.forEach(icon => {
+      icon.textContent = isDark ? 'light_mode' : 'dark_mode'
+    })
 
+    const drawerLabel = document.querySelector('#theme-toggle-drawer .m3-nav-item__label')
     if (drawerLabel) {
-      // Update text content, preserving the md-icon in the start slot
-      const icon = drawerLabel.querySelector('md-icon[slot="start"]')
-      drawerLabel.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          node.textContent = isDark ? '亮色模式' : '深色模式'
-        }
-      })
+      drawerLabel.textContent = isDark ? '亮色模式' : '深色模式'
     }
     localStorage.setItem('theme', theme)
   }
@@ -454,11 +476,17 @@ function renderSkills(filter = '全部') {
         <span class="m3-progress-item__label">${skill.name}</span>
         <span class="m3-progress-item__value">${skill.percent}%</span>
       </div>
-      <md-linear-progress value="0" data-target="${skill.percent / 100}" aria-label="${skill.name} 熟练度 ${skill.percent}%"></md-linear-progress>
+      <div class="m3-linear-progress" role="progressbar" aria-valuenow="${skill.percent}" aria-valuemin="0" aria-valuemax="100" aria-label="${skill.name} 熟练度 ${skill.percent}%">
+        <div class="m3-linear-progress__track">
+          <div class="m3-linear-progress__indicator" data-scale="${skill.percent / 100}">
+            <div class="m3-linear-progress__stop"></div>
+          </div>
+        </div>
+      </div>
     </div>
   `).join('')
 
-  const progressBars = [...container.querySelectorAll('md-linear-progress')]
+  const indicators = [...container.querySelectorAll('.m3-linear-progress__indicator')]
   let animated = false
 
   function startAnimation() {
@@ -470,6 +498,7 @@ function renderSkills(filter = '全部') {
     const stagger = 80
 
     function easeOutBack(t) {
+
       const c1 = 1.2
       return 1 + c1 * Math.pow(t - 1, 3) + (c1 - 1) * Math.pow(t - 1, 2)
     }
@@ -477,18 +506,17 @@ function renderSkills(filter = '全部') {
     function frame(now) {
       const elapsed = now - startTime
 
-      progressBars.forEach((bar, i) => {
+      indicators.forEach((ind, i) => {
         const barStart = i * stagger
         const barElapsed = elapsed - barStart
         if (barElapsed < 0) return
 
         const raw = Math.min(barElapsed / duration, 1)
         const eased = easeOutBack(raw)
-        const target = parseFloat(bar.dataset.target)
-        bar.value = eased * target
+        ind.style.transform = `scaleX(${eased * parseFloat(ind.dataset.scale)})`
       })
 
-      const lastStart = (progressBars.length - 1) * stagger
+      const lastStart = (indicators.length - 1) * stagger
       if (elapsed < lastStart + duration) {
         requestAnimationFrame(frame)
       }
@@ -516,17 +544,18 @@ function initSkillChips() {
   const categories = ['全部', ...Object.keys(skillsByCategory)]
 
   chipsRow.innerHTML = categories.map(cat => `
-    <md-filter-chip label="${cat}" ${cat === '全部' ? 'selected' : ''} data-filter="${cat}"></md-filter-chip>
+    <span class="m3-chip m3-chip--filter ${cat === '全部' ? 'm3-chip--selected' : ''}" data-filter="${cat}">
+      ${cat === '全部' ? '' : '<span class="material-symbols-outlined m3-chip__check">check</span>'}
+      <span class="m3-chip__label">${cat}</span>
+    </span>
   `).join('')
 
   chipsRow.addEventListener('click', (e) => {
-    const chip = e.target.closest('md-filter-chip')
+    const chip = e.target.closest('.m3-chip--filter')
     if (!chip) return
 
-    chipsRow.querySelectorAll('md-filter-chip').forEach(c => {
-      c.selected = false
-    })
-    chip.selected = true
+    chipsRow.querySelectorAll('.m3-chip--filter').forEach(c => c.classList.remove('m3-chip--selected'))
+    chip.classList.add('m3-chip--selected')
 
     const filter = chip.dataset.filter
     renderSkills(filter)
@@ -624,6 +653,7 @@ function init() {
   renderSkills()
   renderProjects()
 
+  initRipples()
   initNavDrawer()
   initThemeToggle()
   initColorSwatches()
