@@ -460,6 +460,13 @@ const projects = [
     tags: ['Rust', 'CLI', 'Open Source'],
     link: 'https://github.com/OpenHelloMiddle/mmover',
   },
+  {
+    icon: '💉',
+    title: 'Zygisk Next Next',
+    desc: 'ZN模块加载器',
+    tags: ['C++', 'Magisk', 'Open Source'],
+    link: 'https://github.com/VeryBaaad/ZygiskNextNext',
+  },
 ]
 
 function renderSkills(filter = '全部') {
