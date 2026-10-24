@@ -462,10 +462,10 @@ const projects = [
   },
   {
     icon: '💉',
-    title: 'Zygisk Next Next',
+    title: 'ZNNext',
     desc: 'ZN模块加载器',
-    tags: ['C++', 'Magisk', 'Open Source'],
-    link: 'https://github.com/VeryBaaad/ZygiskNextNext',
+    tags: ['C++', 'Rust', 'Magisk', 'Open Source'],
+    link: 'https://github.com/VeryBaaad/ZNNext',
   },
 ]
 
